@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from utils import *
 from api.client import AlpacaClient
 
@@ -7,43 +9,32 @@ if __name__ == "__main__":
     # Initialize Alpaca client
     alpaca_client = AlpacaClient()
 
-    # Example: Get account details
-    account = alpaca_client.get_account()
-    print(f"Account Equity: {account['equity']}")
-
-    # Example: Place an order
     # try:
-    #     order = alpaca_client.place_order(
-    #         symbol="AAPL",
-    #         qty=1,
-    #         side="buy",
-    #         order_type="market",
-    #         time_in_force="gtc"
-    #     )
-    #     print(f"Order placed: {order}")
+    #     start_date = datetime(2022, 7, 1, 9, 30, 0)
+    #     end_date = datetime(2022, 7, 1, 17, 0, 0)
+    #     data = alpaca_client.get_historical_stock_prices(["APPL", "TSLA"], start_date, end_date)
+    #     print(data)
     # except Exception as e:
-    #     print(f"Failed to place order: {e}")
+    #     print("Failed to get quotes")
     #
-    # # Example: Get open orders
-    # orders = alpaca_client.get_orders()
-    # print(f"Open Orders: {orders}")
+    # print("Get Account Details: ")
+    # try:
+    #     account = alpaca_client.get_account()
+    #     print(account)
+    # except Exception as e:
+    #     print("Failed to get account details")
     #
-    # # Example: Get positions
-    # positions = alpaca_client.get_positions()
-    # print(f"Positions: {positions}")
+    # try:
+    #     positions = alpaca_client.get_all_positions()
+    #     print(positions)
+    # except Exception as e:
+    #     print("Failed to get account positions")
+
+    print(alpaca_client.get_all_orders())
 
     try:
-        data = alpaca_client.get_latest_quotes("APPL")
-        print(data)
-
+        pass
+        # market_order = alpaca_client.submit_market_order("AAPL", 1, "buy")
+        # print(market_order)
     except Exception as e:
-        print("Failed to get quotes")
-
-    print("Get Account Details: ")
-    try:
-        account = alpaca_client.get_account()
-        print(account)
-
-    except Exception as e:
-        print("Failed to get quotes")
-
+        print("Failed to place order")
