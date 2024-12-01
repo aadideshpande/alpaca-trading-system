@@ -30,7 +30,8 @@ if __name__ == "__main__":
     # except Exception as e:
     #     print("Failed to get account positions")
 
-    print(alpaca_client.get_all_orders())
+    # print(alpaca_client.get_all_orders())
+    alpaca_client.get_real_time_data()
 
     try:
         pass

@@ -13,6 +13,7 @@ from alpaca.data.requests import CryptoLatestQuoteRequest
 from alpaca.data.requests import CryptoBarsRequest, StockBarsRequest, OptionBarsRequest
 from alpaca.trading.enums import OrderSide, TimeInForce, QueryOrderStatus
 from alpaca.trading.requests import LimitOrderRequest, MarketOrderRequest, GetOrdersRequest
+from alpaca.data.live import StockDataStream, CryptoDataStream
 
 
 class AlpacaClient:
@@ -167,3 +168,16 @@ class AlpacaClient:
     def close_all_positions(self):
         """Close all positions and cancel all orders"""
         positions = self.trading_client.close_all_positions(cancel_orders=True)
+
+
+    def get_real_time_data(self):
+        """Get real time crypto data"""
+        wss_client = CryptoDataStream(ALPACA_API_KEY, ALPACA_SECRET_KEY)
+        print("Getting real time data")
+
+        async def quote_data_handler(data):
+            # quote data will arrive here
+            print("Getting data.....")
+            print(data)
+        wss_client.subscribe_quotes(quote_data_handler, "ETH/USD")
+        wss_client.run()
