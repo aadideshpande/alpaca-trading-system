@@ -31,7 +31,10 @@ if __name__ == "__main__":
     #     print("Failed to get account positions")
 
     # print(alpaca_client.get_all_orders())
-    alpaca_client.get_real_time_data()
+    # alpaca_client.get_real_time_data()
+    # market_order = alpaca_client.submit_market_order("AAPL", 1, "buy")
+    print(alpaca_client.check_positions("BTCUSD"))
+
 
     try:
         pass

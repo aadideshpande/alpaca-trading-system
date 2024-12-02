@@ -1,5 +1,5 @@
 from datetime import datetime
-
+import alpaca_trade_api as tradeapi
 import requests
 import os
 
@@ -20,8 +20,8 @@ class AlpacaClient:
     def __init__(self, api_key=None, secret_key=None, base_url=None):
         self.api_key = api_key or ALPACA_API_KEY  # os.getenv("ALPACA_API_KEY")
         self.secret_key = secret_key or ALPACA_SECRET_KEY  # os.getenv("ALPACA_SECRET_KEY")
-        # self.base_paper_url = base_url or PAPER_API
-        # self.base_data_url = DATA_API
+        self.base_paper_url = base_url or PAPER_API
+        self.base_data_url = DATA_API
         # self.headers = {
         #     "APCA-API-KEY-ID": self.api_key,
         #     "APCA-API-SECRET-KEY": self.secret_key,
@@ -104,17 +104,30 @@ class AlpacaClient:
         )
         return self.option_historical_data_client.get_option_bars(request_params)
 
+    def get_historical_crypto_prices(self, symbols, start_date, end_date):
+        """Retrieve the historical options prices"""
+        request_params = CryptoBarsRequest(
+            symbol_or_symbols=symbols,
+            timeframe=TimeFrame.Minute,
+            start=start_date,
+            end=end_date
+
+        )
+        return self.crypto_historical_data_client.get_crypto_bars(request_params)
+
     def submit_market_order(self, symbol, quantity, side):
         """Submit a market order"""
         if side == "buy":
             side = OrderSide.BUY
         elif side == "sell":
             side = OrderSide.SELL
+
+        print(f'Submitting market order with: symbol: {symbol}, qty: {quantity}, side: {side} at time: {datetime.now()}')
         market_order_data = MarketOrderRequest(
             symbol=symbol,
             qty=quantity,
             side=side,
-            time_in_force=TimeInForce.DAY
+            time_in_force=TimeInForce.GTC
         )
 
         # Market order
@@ -164,6 +177,7 @@ class AlpacaClient:
     def get_all_positions(self):
         """Get all positions for that account"""
         positions = self.trading_client.get_all_positions()
+        return positions
 
     def close_all_positions(self):
         """Close all positions and cancel all orders"""
@@ -173,11 +187,21 @@ class AlpacaClient:
     def get_real_time_data(self):
         """Get real time crypto data"""
         wss_client = CryptoDataStream(ALPACA_API_KEY, ALPACA_SECRET_KEY)
+        alpaca_stream = tradeapi.Stream(ALPACA_API_KEY, ALPACA_SECRET_KEY, raw_data=True, crypto_exchanges=['CRYPTO'])
         print("Getting real time data")
 
         async def quote_data_handler(data):
             # quote data will arrive here
             print("Getting data.....")
             print(data)
-        wss_client.subscribe_quotes(quote_data_handler, "ETH/USD")
-        wss_client.run()
+        # wss_client.subscribe_quotes(quote_data_handler, "ETH/USD")
+        alpaca_stream.subscribe_crypto_daily_bars(quote_data_handler, "ETH/USD")
+        # wss_client.run()
+        alpaca_stream.run()
+
+    def check_positions(self, symbol):
+        positions = self.get_all_positions()
+        for p in positions:
+            if p.symbol == symbol:
+                return float(p.qty)
+        return 0
