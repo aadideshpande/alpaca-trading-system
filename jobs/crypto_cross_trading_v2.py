@@ -2,7 +2,7 @@ import time
 
 import numpy as np
 import pandas as pd
-import datetime as datetime
+from datetime import datetime, timedelta
 from api.client import AlpacaClient
 
 from config_loader import *
@@ -13,8 +13,8 @@ alpaca_client = AlpacaClient()
 def cross_sectional_momentum(bar):
     try:
         # Get the Latest Data
-        start_date = datetime.datetime(2024, 12, 1, 12, 0, 0)
-        end_date = datetime.datetime(2024, 12, 1, 17, 0, 0)
+        end_date = datetime.now()
+        start_date = end_date - timedelta(hours=6)
         dataframe = pd.DataFrame()
         symbols = ['BTC/USD', 'ETH/USD', 'SOL/USD'] #['BTC/USD','ETH/USD','DOGE/USD','SHIB/USD','MATIC/USD','ALGO/USD','AVAX/USD','LINK/USD','SOL/USD']
         for symbol in symbols:
@@ -75,7 +75,10 @@ def cross_sectional_momentum(bar):
 
 if __name__ == "__main__":
     alpaca_client.close_all_positions()
-    cross_sectional_momentum(None)
+    start_time = time.time()
+    while time.time() - start_time < 10 * 60:  # 10 minutes
+        cross_sectional_momentum(None)
+        time.sleep(15)
 
 
     #wss_client = CryptoDataStream(ALPACA_API_KEY, ALPACA_SECRET_KEY)
