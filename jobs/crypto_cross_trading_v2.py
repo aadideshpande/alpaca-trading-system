@@ -16,21 +16,29 @@ def cross_sectional_momentum(bar):
         start_date = datetime.datetime(2024, 12, 1, 12, 0, 0)
         end_date = datetime.datetime(2024, 12, 1, 17, 0, 0)
         dataframe = pd.DataFrame()
-        symbols = ['BTC/USD', 'ETH/USD', 'SHIB/USD'] #['BTC/USD','ETH/USD','DOGE/USD','SHIB/USD','MATIC/USD','ALGO/USD','AVAX/USD','LINK/USD','SOL/USD']
+        symbols = ['BTC/USD', 'ETH/USD', 'SOL/USD'] #['BTC/USD','ETH/USD','DOGE/USD','SHIB/USD','MATIC/USD','ALGO/USD','AVAX/USD','LINK/USD','SOL/USD']
         for symbol in symbols:
             data = alpaca_client.get_historical_crypto_prices(symbol, start_date=start_date, end_date=end_date).df['close']
-            data = pd.DataFrame(data)
-            data.reset_index(inplace=True)
-            dataframe = pd.concat([dataframe,data], axis=1, sort=False)
-            # dataframe.reset_index()
 
+            data.index = pd.MultiIndex.from_tuples(data.index, names=["symbol", "time"])
+            new_dataframe = data.unstack(level=0)  # 'level=0' corresponds to 'symbol'
+            # new_dataframe.columns = new_dataframe.columns.droplevel(0)
+            new_dataframe.index = pd.to_datetime(new_dataframe.index)
+            new_dataframe.index.name = 'time'
+
+
+            data = pd.DataFrame(data).rename(columns={"close": str(symbol)})
+
+            dataframe = pd.concat([dataframe,new_dataframe], axis=1, sort=False)
+            # dataframe.reset_index()
+        dataframe.dropna(inplace=True)
         returns_data = dataframe.apply(func = lambda x: x.shift(-1)/x - 1, axis = 0)
 
         # Calculate Momentum Dataframe
         momentum_df = returns_data.apply(func = lambda x: x.shift(1)/x.shift(7) - 1, axis = 0)
         momentum_df = momentum_df.rank(axis = 1)
         for col in momentum_df.columns:
-            momentum_df[col] = np.where(momentum_df[col] > 8, 1, 0)
+            momentum_df[col] = np.where(momentum_df[col] > 2, 1, 0)
 
         # Get Symbol with Highest Momentum
         momentum_df['Buy'] = momentum_df.astype(bool).dot(momentum_df.columns)
