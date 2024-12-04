@@ -37,13 +37,13 @@ paper_api: https://paper-api.alpaca.markets
 | tests        | test for various helper functions                                                    |
 | utils        | various helper functions                                                             |
 | config_loader| use this file to load the configs from the .yaml file                                |
-| jobs         | implementations of day trading strategies                                            |
+| jobs         | implementations of intra-day trading strategies                                      |
 
 
 ## Strategy
 
 This code implements a cross-sectional momentum trading strategy for cryptocurrency trading using the Alpaca API. Here's a brief explanation of the strategy and the workflow:
-    
+(crypto_cross_trading_v2.py)
 #### Strategy Overview
 
     1) Cross-Sectional Momentum:
@@ -91,7 +91,3 @@ We created another alpaca paper trading account to test our strategies and proje
 3) Analyzed the results.
 
 Testing data is stored in **data/testing_trade_data.txt**
-
-
-
-

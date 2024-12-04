@@ -103,10 +103,10 @@ def cross_sectional_momentum(bar):
 if __name__ == "__main__":
     alpaca_client.close_all_positions()
     start_time = time.time()
-    while time.time() - start_time < 60 * 60:  # 10 minutes
+    while time.time() - start_time < 60 * 60:  # 60 minutes
         cross_sectional_momentum(None)
         time.sleep(60)
-
+    alpaca_client.close_all_positions()
 
     #wss_client = CryptoDataStream(ALPACA_API_KEY, ALPACA_SECRET_KEY)
     # Create handler for receiving live bar data
